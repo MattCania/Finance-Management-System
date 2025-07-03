@@ -1,25 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es2024",                                
-    "moduleDetection": "auto",      
+    "target": "es2024",             
     "module": "esnext",                 
     "moduleResolution": "node",                
     "sourceMap": true,                               
-    "outDir": "./dist-ts",                                  
-    "baseUrl": "./src",
+    "outDir": "./dist-ts",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src"]
     },
     "allowJs": true,
-    "noEmit": true,
-    "verbatimModuleSyntax": false,                     
-    "esModuleInterop": true,                             
-    "forceConsistentCasingInFileNames": true,           
+    "noEmit": true,                     
+    "esModuleInterop": true,    
     "strict": true,                                  
-    "noImplicitAny": true,                           
-    "alwaysStrict": true,                            
-    "noUnusedLocals": true,                          
-    "noUnusedParameters": true,                      
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,  
   },

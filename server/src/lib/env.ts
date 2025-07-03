@@ -7,6 +7,7 @@ const envSchema = z.object({
 		message: "DB_PORT must be a number"
 	}),
 	PRISMA_URL: string(),
+	DATABASE_URL: string()
 })
 
 const parsed = envSchema.safeParse(process.env)

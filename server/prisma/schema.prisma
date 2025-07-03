@@ -1,7 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
-  output = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -9,28 +7,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         Int      @id @default(autoincrement())
+model Account {
+  id         String   @id @default(uuid())
   email      String   @unique
   password   String   @db.VarChar(255)
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  profile    Profile?
-  wallet     Wallet?
+  Profile    Profile?
+  Wallet     Wallet?
+  Transactions  Transactions[]
 }
 
 model Profile {
-  id         Int      @id @default(autoincrement())
-  user_id    Int      @unique
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  firstname  String 
+  middlename String
+  lastname   String 
+  birthday   DateTime 
+  age        Int
+  address    String 
+  country    String 
+  timezone   String 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  user       User     @relation(fields: [user_id], references: [id])
+  user       Account  @relation(fields: [user_id], references: [id])
 }
 
 model Wallet {
-  id         Int      @id @default(autoincrement())
-  user_id    Int      @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
-  user       User     @relation(fields: [user_id], references: [id])
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  currency        String   @default("PHP")
+  initial_deposit Decimal      @default(0)
+  income_amount   Decimal      @default(0)   
+  income_period   String   @default("monthly")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now()) @updatedAt
+  user            Account  @relation(fields: [user_id], references: [id])
+}
+
+model Transactions {
+  id                    String    @id @default(uuid())
+  user_id               String    @unique
+  transaction_id        String?   @unique
+  transaction_type      String?   @default("expenses")
+  transaction_date      DateTime  @default(now())
+  transaction_discount  Boolean   @default(false)
+  discount_amount       Decimal   @default(0)
+  transaction_tax       Decimal   @default(0)
+  balance               Decimal
+  transaction_amount    String
+  remaining_balance     String
+  user          Account @relation(fields: [user_id], references: [id]) 
 }

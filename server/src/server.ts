@@ -1,10 +1,21 @@
-import { env } from "./libs/env.ts"
+import { env } from "./lib/env.ts"
 import { fastify } from "./app.ts"
+import {prisma} from "./lib/database.ts"
 
-fastify.get('/', () => {
-  return { hello: 'world' }
+
+
+fastify.get('/', async (request, reply) => {
+	try {
+		reply.send({message: "Hello"})
+	} catch (error) {
+		reply.send({error})
+	}
 })
 
-await fastify.listen({port: env.SERVER_PORT})
-	.then(() => console.log("Server Up!"))
-	.catch((error) => console.error("Server Failed!", error))
+try {
+	await fastify.listen({ port: env.SERVER_PORT })
+	console.log("Server Up!")
+} catch (err) {
+	console.error("Server Failed!", err)
+	process.exit(1)
+}
