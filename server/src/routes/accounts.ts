@@ -1,5 +1,4 @@
 import { FastifyInstance } from "fastify";
-import { prisma } from "../lib/database.ts";
 import bcrypt from "bcryptjs";
 import { calculate_age } from "../utils/helpers.ts";
 
@@ -67,7 +66,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
 
         if (!password) throw new Error("Error Account Creation");
 
-        const account_response = await prisma.account.create({
+        const account_response = await fastify.prisma.account.create({
           data: {
             email: formData.email,
             password: password,
@@ -77,7 +76,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
         if (!account_response) throw new Error("Error Account Creation");
 
         const age = await calculate_age(formData.birthday)
-        const profile_response = await prisma.profile.create({
+        const profile_response = await fastify.prisma.profile.create({
           data: {
             firstname: formData.firstname,
             middlename: formData.middlename || '',
@@ -92,11 +91,11 @@ export default async function accountsRoute(fastify: FastifyInstance) {
         })
 
         if (!profile_response) {
-            await prisma.account.delete({where: {id: account_response.id}})
+            await fastify.prisma.account.delete({where: {id: account_response.id}})
             throw new Error ("Error Account Creation")  
         }
 
-        const wallet_response = await prisma.wallet.create({
+        const wallet_response = await fastify.prisma.wallet.create({
           data: {
             currency: formData.currency,
             initial_deposit: formData.initial_deposit,
@@ -107,8 +106,8 @@ export default async function accountsRoute(fastify: FastifyInstance) {
         })
 
         if (!wallet_response) {
-            await prisma.profile.delete({where: {user_id: account_response.id}})
-            await prisma.account.delete({where: {id: account_response.id}})
+            await fastify.prisma.profile.delete({where: {user_id: account_response.id}})
+            await fastify.prisma.account.delete({where: {id: account_response.id}})
             throw new Error ("Error Account Creation")  
         }
 
@@ -165,7 +164,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
       try {
         const { id } = request.query as { id: string };
 
-        const response = await prisma.account.findUnique({
+        const response = await fastify.prisma.account.findUnique({
           where: {
             id: id,
           },
