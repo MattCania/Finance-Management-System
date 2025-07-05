@@ -1,15 +1,8 @@
 import { env } from "./lib/env.ts"
 import { fastify } from "./app.ts"
-import {prisma} from "./lib/database.ts"
-
-
 
 fastify.get('/', async (request, reply) => {
-	try {
-		reply.send({message: "Hello"})
-	} catch (error) {
-		reply.send({error})
-	}
+	return ({message: "Hello"})
 })
 
 try {
