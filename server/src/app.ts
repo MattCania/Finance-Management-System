@@ -1,14 +1,13 @@
 import Fastify from "fastify";
 // import Redis from '@fastify/redis'
 import cors from '@fastify/cors' 
+
 import prismaPlugin from './plugins/prisma.ts'
 import bcryptPlugin from './plugins/bcrypt.ts'
 import jwtPlugin from './plugins/jwt.ts'
 
 import accountsRoute from "./routes/accounts.ts";
 import authRoute from './routes/authenticate.ts'
-import cookie from "@fastify/cookie";
-import { env } from "./lib/env.ts";
 
 const fastify = Fastify({
 	logger: false
@@ -27,9 +26,6 @@ fastify.register(cors, {
 // 	family: 4
 // })
 
-fastify.register(cookie, {
-  secret: env.COOKIE_SECRET,
-});
 // Plugins
 fastify.register(bcryptPlugin)
 fastify.register(prismaPlugin)

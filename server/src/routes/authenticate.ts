@@ -33,8 +33,12 @@ export default async function authRoute(fastify: FastifyInstance) {
     },
     preValidation: [fastify.authenticate],
     handler: async function (request, reply) {
-      const user = request.user as { id: string; email: string };
+      if (env.NODE_ENV === "development") {
+        console.log("Session Fetching");
+        console.log("Existing Cookie: ", request.cookies.cookie);
+      }
 
+      const user = request.user as { id: string; email: string };
       const account = await fastify.prisma.account.findFirst({
         where: { id: user.id },
         select: {
@@ -60,7 +64,7 @@ export default async function authRoute(fastify: FastifyInstance) {
         httpOnly: true,
         sameSite: "lax",
         secure: env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 12, 
+        maxAge: 60 * 60 * 12,
       });
 
       reply.send({
@@ -118,14 +122,44 @@ export default async function authRoute(fastify: FastifyInstance) {
     handler: async function (request, reply) {
       const formData = request.body as { email: string; password: string };
 
+      if (env.NODE_ENV === "development") {
+        console.log("User Log In");
+        console.log("FormData: ", formData);
+      }
+
+      if (!formData || !formData.email || !formData.password) {
+        return reply
+          .status(401)
+          .send({
+            error: "Failed Logging In!",
+            type: "Missing Credentials",
+            ok: false,
+          });
+      } else if (!formData.email.includes("@")) {
+        return reply
+          .status(401)
+          .send({
+            error: "Failed Logging In!",
+            type: "Invalid Email",
+            ok: false,
+          });
+      } else if (formData.password.length < 8 || formData.password.length > 15)
+        return reply
+          .status(401)
+          .send({
+            error: "Failed Logging In!",
+            type: "Invalid Password Length",
+            ok: false,
+          });
+
       try {
         const account_response = await fastify.prisma.account.findFirst({
           where: { email: formData.email },
           select: {
             id: true,
             email: true,
-            password: true
-          }
+            password: true,
+          },
         });
 
         if (!account_response)
@@ -151,8 +185,8 @@ export default async function authRoute(fastify: FastifyInstance) {
 
         const data = {
           id: account_response.id,
-          email: account_response.email
-        }
+          email: account_response.email,
+        };
 
         const token = fastify.jwt.sign(
           { id: account_response.id, email: account_response.email },
