@@ -8,55 +8,55 @@ datasource db {
 }
 
 model Account {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  password   String   @db.VarChar(255)
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
-  Profile    Profile?
-  Wallet     Wallet?
-  Transactions  Transactions[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String        @db.VarChar(255)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now()) @updatedAt
+  Profile      Profile?
+  Transactions Transactions?
+  Wallet       Wallet?
 }
 
 model Profile {
   id         String   @id @default(uuid())
   user_id    String   @unique
-  firstname  String 
-  middlename String
-  lastname   String 
-  birthday   DateTime 
-  age        Int
-  address    String 
-  country    String 
-  timezone   String 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
+  address    String
+  age        Int
+  country    String
+  firstname  String
+  lastname   String
+  middlename String
+  timezone   String
+  birthday   DateTime
   user       Account  @relation(fields: [user_id], references: [id])
 }
 
 model Wallet {
   id              String   @id @default(uuid())
   user_id         String   @unique
-  currency        String   @default("PHP")
-  initial_deposit Decimal      @default(0)
-  income_amount   Decimal      @default(0)   
-  income_period   String   @default("monthly")
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now()) @updatedAt
+  currency        String   @default("PHP")
+  income_amount   Decimal  @default(0) @db.Decimal(15, 2)
+  income_period   String   @default("monthly")
+  balance         Decimal  @default(0) @db.Decimal(15, 2)
   user            Account  @relation(fields: [user_id], references: [id])
 }
 
 model Transactions {
-  id                    String    @id @default(uuid())
-  user_id               String    @unique
-  transaction_id        String?   @unique
-  transaction_type      String?   @default("expenses")
-  transaction_date      DateTime  @default(now())
-  transaction_discount  Boolean   @default(false)
-  discount_amount       Decimal   @default(0)
-  transaction_tax       Decimal   @default(0)
-  balance               Decimal
-  transaction_amount    String
-  remaining_balance     String
-  user          Account @relation(fields: [user_id], references: [id]) 
+  id                   String   @id @default(uuid())
+  user_id              String   @unique
+  transaction_id       String?  @unique
+  transaction_type     String?  @default("expenses")
+  transaction_date     DateTime @default(now())
+  transaction_discount Boolean  @default(false)
+  discount_amount      Decimal  @default(0) @db.Decimal(15, 2)
+  transaction_tax      Decimal  @default(0) @db.Decimal(15, 2)
+  balance              Decimal  @db.Decimal(15, 2)
+  transaction_amount   Decimal  @db.Decimal(15, 2)
+  remaining_balance    Decimal  @db.Decimal(15, 2)
+  user                 Account  @relation(fields: [user_id], references: [id])
 }

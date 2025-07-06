@@ -1,6 +1,6 @@
-import { FastifyInstance } from "fastify";
+import { AccountSchema, FastifyInstance } from "fastify";
 import bcrypt from "bcryptjs";
-import { calculate_age } from "../utils/helpers.ts";
+import { calculate_age, validate_account } from "../utils/helpers.ts";
 
 export default async function accountsRoute(fastify: FastifyInstance) {
   // Create an account
@@ -20,7 +20,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
           birthday: { type: 'string', format: 'date-time'},
           address: { type: 'string' },
           country: { type: 'string' },
-          timezone: {type: 'string', format: 'time'},
+          timezone: {type: 'string'},
           currency: { type: 'string' },
           initial_deposit: { type: 'number' },
           income_period: { type: 'string' },
@@ -45,71 +45,51 @@ export default async function accountsRoute(fastify: FastifyInstance) {
       },
     },
     handler: async function (request, reply) {
+      console.log("Creating Account")
+      const formData = request.body as AccountSchema
+
       try {
-        const formData = request.body as 
-          { email: string,
-            password: string,
-            firstname: string,
-            middlename: string,
-            lastname: string,
-            birthday: string,
-            address: string,
-            country: string,
-            timezone: string,
-            currency: string,
-            initial_deposit: number,
-            income_amount: number,
-            income_period: string,
-          };
+
+        const isValid = await validate_account(formData)
+
+        if (!isValid.parsed) return reply.status(409).send({error: "Invalid Input Types", type: "Conflicting Field Types", ok: false})
+        if (isValid.errors.length > 0) return reply.status(401).send({error: isValid.errors, type: "Unauthorized Request due to Input Field Mismatch", ok: false})
+        
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(formData.password, salt);
 
         if (!password) throw new Error("Error Account Creation");
 
+        const age = await calculate_age(formData.birthday)
+        
         const account_response = await fastify.prisma.account.create({
           data: {
             email: formData.email,
             password: password,
+            Profile: {
+              create: {
+                firstname: formData.firstname,
+                middlename: formData.middlename || "",
+                lastname: formData.lastname,
+                birthday: new Date(formData.birthday),
+                age: age,
+                address: formData.address,
+                country: formData.country,
+                timezone: formData.timezone,
+              },
+            },
+            Wallet: {
+              create: {
+                currency: formData.currency,
+                balance: formData.initial_deposit,
+                income_amount: formData.income_amount,
+                income_period: formData.income_period,
+              },
+            },
           },
         });
 
         if (!account_response) throw new Error("Error Account Creation");
-
-        const age = await calculate_age(formData.birthday)
-        const profile_response = await fastify.prisma.profile.create({
-          data: {
-            firstname: formData.firstname,
-            middlename: formData.middlename || '',
-            lastname: formData.lastname,
-            birthday: new Date(formData.birthday),
-            age: age,
-            address: formData.address,
-            country: formData.country,
-            timezone: formData.timezone,
-            user_id: account_response.id
-          }
-        })
-
-        if (!profile_response) {
-            await fastify.prisma.account.delete({where: {id: account_response.id}})
-            throw new Error ("Error Account Creation")  
-        }
-
-        const wallet_response = await fastify.prisma.wallet.create({
-          data: {
-            currency: formData.currency,
-            initial_deposit: formData.initial_deposit,
-            income_amount: formData.income_amount,
-            income_period: formData.income_period,
-            user_id: account_response.id  
-          }
-        })
-
-        if (!wallet_response) {
-            await fastify.prisma.profile.delete({where: {user_id: account_response.id}})
-            await fastify.prisma.account.delete({where: {id: account_response.id}})
-            throw new Error ("Error Account Creation")  
-        }
 
         reply
           .status(200)

@@ -8,6 +8,7 @@ import jwtPlugin from './plugins/jwt.ts'
 
 import accountsRoute from "./routes/accounts.ts";
 import authRoute from './routes/authenticate.ts'
+import walletRoute from "./routes/wallet.ts";
 
 const fastify = Fastify({
 	logger: false
@@ -15,6 +16,7 @@ const fastify = Fastify({
 
 fastify.register(cors, {
 	methods: ['POST', 'GET', 'DELETE', 'PUT'],
+	credentials: true,
 	origin: true
 })
 
@@ -34,5 +36,6 @@ fastify.register(jwtPlugin)
 // Routes
 fastify.register(accountsRoute, { prefix: '/account' })
 fastify.register(authRoute, { prefix: '/auth' })
+fastify.register(walletRoute, { prefix: '/wallet' })
 
 export {fastify}

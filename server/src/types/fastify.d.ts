@@ -1,8 +1,8 @@
-import 'fastify';
-import { PrismaClient } from '@prisma/client';
-import type bcrypt from 'bcryptjs'
+import "fastify";
+import { PrismaClient } from "@prisma/client";
+import type bcrypt from "bcryptjs";
 
-declare module 'fastify' {
+declare module "fastify" {
   interface FastifyInstance {
     prisma: PrismaClient;
     bcrypt: typeof bcrypt;
@@ -10,7 +10,7 @@ declare module 'fastify' {
       request: FastifyRequest,
       reply: FastifyReply
     ) => Promise<void>;
-    
+
     // redis: Redis;
   }
   interface FastifyRequest {
@@ -31,5 +31,21 @@ declare module 'fastify' {
       name: string,
       options?: import("@fastify/cookie").CookieSerializeOptions
     ) => FastifyReply;
+  }
+
+  interface AccountSchema {
+    email: string;
+    password: string;
+    firstname: string;
+    middlename: string;
+    lastname: string;
+    birthday: string;
+    address: string;
+    country: string;
+    timezone: string;
+    currency: string;
+    initial_deposit: number;
+    income_amount: number;
+    income_period: string;
   }
 }

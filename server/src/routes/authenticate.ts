@@ -17,7 +17,6 @@ export default async function authRoute(fastify: FastifyInstance) {
               type: "object",
               properties: {
                 id: { type: "string" },
-                email: { type: "string" },
               },
             },
           },
@@ -39,6 +38,7 @@ export default async function authRoute(fastify: FastifyInstance) {
       }
 
       const user = request.user as { id: string; email: string };
+      console.log({user: user})
       const account = await fastify.prisma.account.findFirst({
         where: { id: user.id },
         select: {

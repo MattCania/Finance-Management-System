@@ -21,7 +21,7 @@ export default fp(async function jwtPlugin(fastify: FastifyInstance) {
       secret: env.JWT_SECRET as string,
       cookie: {
         cookieName: "token",
-        signed: false,
+        signed: false  ,
       },
     }
   );
@@ -30,6 +30,7 @@ export default fp(async function jwtPlugin(fastify: FastifyInstance) {
     "authenticate",
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
+        console.log("Verifying JWT Token")
         await request.jwtVerify();
       } catch (error) {
         console.error(error);
