@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 // import Redis from '@fastify/redis'
 import cors from '@fastify/cors' 
+import compress from '@fastify/compress'
 
 import prismaPlugin from './plugins/prisma.ts'
 import bcryptPlugin from './plugins/bcrypt.ts'
@@ -18,6 +19,21 @@ fastify.register(cors, {
 	methods: ['POST', 'GET', 'DELETE', 'PUT'],
 	credentials: true,
 	origin: true
+})
+
+fastify.register(compress, {
+	global: true,
+	threshold: 1024,
+	encodings: ["br", "gzip"],
+	customTypes: /^text\/|\+json$/,
+	zlib: true,
+	zlibOptions: {
+		level: 6
+	},
+	onUnsupportedEncoding: (encoding, request, reply) => {
+      reply.code(406)
+      return 'We do not support the ' + encoding + ' encoding.'
+    }
 })
 
 // Caching (Havent setup redis-server yet)

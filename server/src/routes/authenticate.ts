@@ -75,6 +75,7 @@ export default async function authRoute(fastify: FastifyInstance) {
     },
   });
 
+  // Login Route
   fastify.route({
     method: "POST",
     url: "/login",
@@ -120,6 +121,7 @@ export default async function authRoute(fastify: FastifyInstance) {
       },
     },
     handler: async function (request, reply) {
+      console.log("Logging In")
       const formData = request.body as { email: string; password: string };
 
       if (env.NODE_ENV === "development") {
