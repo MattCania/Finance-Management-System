@@ -1,6 +1,12 @@
 import { AccountSchema, FastifyInstance } from "fastify";
 import bcrypt from "bcryptjs";
 import { calculate_age, validate_account } from "../utils/helpers.ts";
+import {
+  AccountProperties,
+  ErrorResponse,
+  FailureResponse,
+  SuccessResponse,
+} from "../data/objects.ts";
 
 export default async function accountsRoute(fastify: FastifyInstance) {
   // Create an account
@@ -10,22 +16,15 @@ export default async function accountsRoute(fastify: FastifyInstance) {
     schema: {
       body: {
         type: "object",
-        required: ["email", "password", "firstname", "middlename", "lastname", "birthday"],
-        properties: {
-          email: { type: "string" },
-          password: { type: "string" },
-          firstname: { type: "string" },
-          middlename: { type: "string" },
-          lastname: { type: "string" },
-          birthday: { type: 'string', format: 'date-time'},
-          address: { type: 'string' },
-          country: { type: 'string' },
-          timezone: {type: 'string'},
-          currency: { type: 'string' },
-          initial_deposit: { type: 'number' },
-          income_period: { type: 'string' },
-          income_amount: { type: 'number' },
-        },
+        required: [
+          "email",
+          "password",
+          "firstname",
+          "middlename",
+          "lastname",
+          "birthday",
+        ],
+        properties: AccountProperties,
       },
       response: {
         200: {
@@ -45,23 +44,36 @@ export default async function accountsRoute(fastify: FastifyInstance) {
       },
     },
     handler: async function (request, reply) {
-      console.log("Creating Account")
-      const formData = request.body as AccountSchema
+      console.log("Creating Account");
+      const formData = request.body as AccountSchema;
 
       try {
+        const isValid = await validate_account(formData);
 
-        const isValid = await validate_account(formData)
+        if (!isValid.parsed)
+          return reply
+            .status(409)
+            .send({
+              error: "Invalid Input Types",
+              type: "Conflicting Field Types",
+              ok: false,
+            });
+        if (isValid.errors.length > 0)
+          return reply
+            .status(401)
+            .send({
+              error: isValid.errors,
+              type: "Unauthorized Request due to Input Field Mismatch",
+              ok: false,
+            });
 
-        if (!isValid.parsed) return reply.status(409).send({error: "Invalid Input Types", type: "Conflicting Field Types", ok: false})
-        if (isValid.errors.length > 0) return reply.status(401).send({error: isValid.errors, type: "Unauthorized Request due to Input Field Mismatch", ok: false})
-        
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(formData.password, salt);
 
         if (!password) throw new Error("Error Account Creation");
 
-        const age = await calculate_age(formData.birthday)
-        
+        const age = await calculate_age(formData.birthday);
+
         const account_response = await fastify.prisma.account.create({
           data: {
             email: formData.email,
@@ -144,24 +156,23 @@ export default async function accountsRoute(fastify: FastifyInstance) {
       try {
         const { id } = request.query as { id: string };
 
-        const response = await fastify.prisma.account.findUnique({
+        const data = await fastify.prisma.account.findUnique({
           where: {
             id: id,
           },
+          select: {
+            id: true,
+            email: true,
+            created_at: true,
+          },
         });
 
-        if (!response) throw new Error("Error Account Fetching");
-
-        const accountData = {
-          id: response.id,
-          email: response.email,
-          createdAt: response.created_at,
-        };
+        if (!data) throw new Error("Error Account Fetching");
 
         reply.status(200).send({
           success: "Account Fetched Successfuly",
           ok: true,
-          data: accountData,
+          // data: data,
         });
       } catch (error) {
         console.error(error);
