@@ -17,9 +17,9 @@ const fastify = Fastify({
 })
 
 fastify.register(cors, {
-	methods: ['POST', 'GET', 'DELETE', 'PUT'],
 	credentials: true,
-	origin: true
+	origin: 'http://localhost:5173',
+	methods: ['POST', 'PUT', 'DELETE', 'GET']
 })
 
 fastify.register(compress, {

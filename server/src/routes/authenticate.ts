@@ -34,11 +34,10 @@ export default async function authRoute(fastify: FastifyInstance) {
     handler: async function (request, reply) {
       if (env.NODE_ENV === "development") {
         console.log("Session Fetching");
-        console.log("Existing Cookie: ", request.cookies.cookie);
       }
 
       const user = request.user as { id: string; email: string };
-      console.log({user: user})
+      
       const account = await fastify.prisma.account.findFirst({
         where: { id: user.id },
         select: {
@@ -101,6 +100,7 @@ export default async function authRoute(fastify: FastifyInstance) {
                 email: { type: "string" },
               },
             },
+            token: {type: 'string'}
           },
         },
         401: {
@@ -204,11 +204,45 @@ export default async function authRoute(fastify: FastifyInstance) {
             secure: env.NODE_ENV === "production",
           })
           .status(200)
-          .send({ success: "Successful Login", ok: true, data: data });
+          .send({ success: "Successful Login", ok: true, data: data, token: token });
       } catch (error) {
         console.error(error);
         reply.status(500).send({ server_failure: error, ok: false });
       }
     },
   });
+
+  // Logout user
+  fastify.route({
+    method: 'POST',
+    url: '/logout',
+    schema: {
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: "string" },
+            ok: { type: 'boolean' } 
+          }
+        },
+        500: {
+          type: "object",
+          properties: {
+            server_failure: { type: "string" },
+            ok: { type: "boolean" },
+          },
+        },
+      }
+    },
+    preHandler: [fastify.authenticate],
+    handler: async function (request, reply) {
+      try {
+        console.log("User Logged Out")
+        reply.clearCookie('token').status(200).send({success: "User Logged Out Successfully", ok: true})
+      } catch (error) {
+        console.error(error)
+        return reply.status(500).send({server_failure: error, ok: false})
+      }
+    }
+  })
 }
