@@ -70,6 +70,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
         if (!password) throw new Error("Error Account Creation");
 
         const age = await calculate_age(formData.birthday);
+        console.log(formData.birthday)
 
         const account_response = await fastify.prisma.account.create({
           data: {
@@ -80,17 +81,16 @@ export default async function accountsRoute(fastify: FastifyInstance) {
                 firstname: formData.firstname,
                 middlename: formData.middlename || "",
                 lastname: formData.lastname,
-                birthday: new Date(formData.birthday),
+                birthday: formData.birthday,
                 age: age,
                 address: formData.address,
                 country: formData.country,
-                timezone: formData.timezone,
               },
             },
             Wallet: {
               create: {
                 currency: formData.currency,
-                balance: formData.initial_deposit,
+                balance: Number(formData.initial_deposit),
                 income_amount: formData.income_amount,
                 income_period: formData.income_period,
               },

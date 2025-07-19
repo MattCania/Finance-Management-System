@@ -34,7 +34,6 @@ export async function validate_account(account: AccountSchema) {
     birthday: z.string(),
     address: z.string(),
     country: z.string(),
-    timezone: z.string(),
     currency: z.string(),
     initial_deposit: z.number(),
     income_amount: z.number(),

@@ -29,7 +29,6 @@ model Profile {
   firstname  String
   lastname   String
   middlename String
-  timezone   String
   birthday   DateTime
   user       Account  @relation(fields: [user_id], references: [id])
 }

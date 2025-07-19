@@ -42,7 +42,6 @@ declare module "fastify" {
     birthday: string;
     address: string;
     country: string;
-    timezone: string;
     currency: string;
     initial_deposit: number;
     income_amount: number;

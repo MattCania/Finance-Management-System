@@ -5,7 +5,7 @@ const AccountProperties = {
   firstname: { type: "string" },
   middlename: { type: "string" },
   lastname: { type: "string" },
-  birthday: { type: "string", format: "date-time" },
+  birthday: { type: "string"},
   address: { type: "string" },
   country: { type: "string" },
   timezone: { type: "string" },
