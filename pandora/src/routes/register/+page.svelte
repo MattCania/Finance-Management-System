@@ -12,22 +12,22 @@
 	const nav = [
 		{
 			label: 'Home',
-			href: '/',
+			href: '/home',
 			icon: faHouse
 		},
 		{
 			label: 'Services',
-			href: '/services',
+			href: '/home/services',
 			icon: faScrewdriverWrench
 		},
 		{
 			label: 'Contacts',
-			href: '/contacts',
+			href: '/home/contacts',
 			icon: faAddressBook
 		},
 		{
 			label: 'About',
-			href: '/about',
+			href: '/home/about',
 			icon: faExclamation
 		},
 	]

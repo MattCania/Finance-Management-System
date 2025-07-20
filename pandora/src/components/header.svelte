@@ -11,7 +11,7 @@
 		nav = [
 			{
 				label: "Home",
-				href: '/',
+				href: '/home',
 				active: currentPath === '/'
 			},
 			// {
@@ -21,12 +21,12 @@
 			// },
 			{
 				label: "Contacts",
-				href: '/contacts',
+				href: '/home/contacts',
 				active: currentPath === '/contacts'
 			},
 			{
 				label: "About",
-				href: '/about',
+				href: '/home/about',
 				active: currentPath === '/about'
 			},
 		]

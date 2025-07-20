@@ -1,9 +1,9 @@
 <script lang="ts">
-	let {children} = $props()
+	import Header from '../../components/header.svelte'
+	let { children } = $props();
 </script>
 
-<section
-	class="flex flex-col w-full h-full"
->
+<main class="flex flex-col justify-start items-center h-screen w-full">	
+	<Header/>
 	{@render children()}
-</section>
+</main>
