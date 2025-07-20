@@ -120,12 +120,11 @@ export default async function authRoute(fastify: FastifyInstance) {
         },
       },
     },
-    handler: async function (request, reply) {
-      console.log("Logging In")
+    handler: async function (request, reply) {      
       const formData = request.body as { email: string; password: string };
 
       if (env.NODE_ENV === "development") {
-        console.log("User Log In");
+        console.log("User Logged In");
         console.log("FormData: ", formData);
       }
 
@@ -237,7 +236,6 @@ export default async function authRoute(fastify: FastifyInstance) {
     preHandler: [fastify.authenticate],
     handler: async function (request, reply) {
       try {
-        console.log("User Logged Out")
         reply.clearCookie('token').status(200).send({success: "User Logged Out Successfully", ok: true})
       } catch (error) {
         console.error(error)

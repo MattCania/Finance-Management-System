@@ -8,7 +8,6 @@ const AccountProperties = {
   birthday: { type: "string"},
   address: { type: "string" },
   country: { type: "string" },
-  timezone: { type: "string" },
   currency: { type: "string" },
   initial_deposit: { type: "number" },
   income_period: { type: "string" },
@@ -16,7 +15,6 @@ const AccountProperties = {
 };
 
 // Error Response
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ErrorResponse = () => ({
   type: "object",
   required: ["error", "type", "code", "ok"],

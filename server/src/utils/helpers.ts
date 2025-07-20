@@ -4,7 +4,8 @@ import { z } from "zod";
 export async function calculate_age(birthday: string) {
   const birthdate = new Date(birthday);
   const today = new Date();
-  let age: number = Number(today.getFullYear()) - Number(birthdate.getFullYear());
+  let age: number =
+    Number(today.getFullYear()) - Number(birthdate.getFullYear());
 
   const monthDifference = today.getMonth() - birthdate.getMonth();
 
@@ -17,10 +18,12 @@ export async function calculate_age(birthday: string) {
   return age;
 }
 
-export function validate_date(dateString: string) {
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
-}
+// export function validate_date(dateString: string) {
+//   const date = new Date()
+//   if (dateString.length > 9) return false
+//   if (Number(dateString.slice(5, dateString.length - 1)) > date.getFullYear()) return false
+//   return true
+// }
 
 export async function validate_account(account: AccountSchema) {
   const errors = [];
@@ -35,7 +38,7 @@ export async function validate_account(account: AccountSchema) {
     address: z.string(),
     country: z.string(),
     currency: z.string(),
-    initial_deposit: z.number(),
+    balance: z.number(),
     income_amount: z.number(),
     income_period: z.string(),
   });
@@ -49,8 +52,8 @@ export async function validate_account(account: AccountSchema) {
     errors.push({
       password: "Invalid Password Length! Must be 8 to 20 characters only",
     });
-  if (!validate_date(account.birthday))
-    errors.push({ birthday: "Invalid Birthday" });
+  // if (!validate_date(account.birthday))
+  //   errors.push({ birthday: "Invalid Birthday" });
   if (age < 18) errors.push({ age: "Invalid Age" });
   if (
     !["PHP", "USD", "EUR", "JPY", "GBP"].includes(
@@ -64,7 +67,9 @@ export async function validate_account(account: AccountSchema) {
     )
   )
     errors.push({ income_period: "Invalid Income Period" });
-  if (account.income_amount < 1000 || account.initial_deposit < 1000)
+  if (isNaN(Number(account.income_amount)) || isNaN(Number(account.balance)))
+    errors.push({ income_period: "Invalid Income Period" });
+  if (Number(account.income_amount) < 1000 || Number(account.balance) < 1000)
     errors.push({
       income: "Income Amount or Initial Deposit must contain at least 1000",
     });

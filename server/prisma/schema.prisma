@@ -29,7 +29,7 @@ model Profile {
   firstname  String
   lastname   String
   middlename String
-  birthday   DateTime
+  birthday   String
   user       Account  @relation(fields: [user_id], references: [id])
 }
 

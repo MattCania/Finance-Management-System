@@ -43,7 +43,7 @@ declare module "fastify" {
     address: string;
     country: string;
     currency: string;
-    initial_deposit: number;
+    balance: number;
     income_amount: number;
     income_period: string;
   }
