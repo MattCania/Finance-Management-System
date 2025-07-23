@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DashboardHeader from '../../components/dashboard_header.svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	let { children } = $props();
@@ -50,33 +51,5 @@
 
 </script>
 
-<header class="flex w-full h-12 justify-center items-center gap-16 bg-zinc-950">
-	<a 
-		class="text-white w-auto px-4 border-white border-1 rounded-lg" 
-		href="/dashboard">
-		Dashboard
-	</a>
-	<a 
-		class="text-white w-auto px-4 border-white border-1 rounded-lg" 
-		href="/dashboard/profile">
-		Profile
-	</a>
-	<a 
-		class="text-white w-auto px-4 border-white border-1 rounded-lg" 
-		href="/dashboard/wallet">
-		Wallet
-	</a>
-	<a 
-		class="text-white w-auto px-4 border-white border-1 rounded-lg" 
-		href="/dashboard/transactions">
-		Transactions
-	</a>
-	<button
-	onclick={logout}
-		class="text-white w-auto px-4 border-white border-1 rounded-lg" 
-	>
-		Log Out
-	</button>
-	
-</header>
+<DashboardHeader/>
 {@render children()}

@@ -16,6 +16,7 @@ model Account {
   Profile      Profile?
   Transactions Transactions?
   Wallet       Wallet?
+  Mails         Mails?
 }
 
 model Profile {
@@ -58,4 +59,29 @@ model Transactions {
   transaction_amount   Decimal  @db.Decimal(15, 2)
   remaining_balance    Decimal  @db.Decimal(15, 2)
   user                 Account  @relation(fields: [user_id], references: [id])
+}
+
+enum Status {
+  READ
+  UNREAD
+  TRASHED
+}
+
+model Attachment {
+  file_id String @id @default(uuid())
+  file_name String
+  file Bytes
+  mails Mails?
+}
+
+model Mails{
+  mail_id                  String @id @default(uuid())
+  user_id String @unique
+  title String
+  sub_title String
+  description String
+  status Status
+  attachment_id String? @unique
+  attachment Attachment? @relation(fields: [attachment_id], references: [file_id])
+  user Account @relation(fields: [user_id], references: [id])
 }

@@ -11,7 +11,9 @@ import accountsRoute from "./routes/accounts.ts";
 import authRoute from './routes/authenticate.ts'
 import walletRoute from "./routes/wallet.ts";
 import transactionsRoute from "./routes/transactions.ts";
+import profileRoute from "./routes/profile.ts";
 
+// Create fastify instance
 const fastify = Fastify({
 	logger: false
 })
@@ -45,15 +47,23 @@ fastify.register(compress, {
 // 	family: 4
 // })
 
-// Plugins
+// Plugins 
+/**
+ * Register Plugins through fastify
+ */
 fastify.register(bcryptPlugin)
 fastify.register(prismaPlugin)
 fastify.register(jwtPlugin)
 
 // Routes
+/**
+ * Default application of routes w/ prefix
+ */
 fastify.register(accountsRoute, { prefix: '/account' })
+fastify.register(profileRoute, { prefix: '/profile' })
 fastify.register(authRoute, { prefix: '/auth' })
 fastify.register(walletRoute, { prefix: '/wallet' })
 fastify.register(transactionsRoute, { prefix: '/transaction' })
 
+// Export mutated fastify instance for server listening
 export {fastify}

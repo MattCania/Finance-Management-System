@@ -177,6 +177,114 @@ export default async function accountsRoute(fastify: FastifyInstance) {
     },
   });
 
+  // Fetch full account (Account, Profile, Wallet)
+  fastify.route({
+  method: "GET",
+  url: "/fetch_profile",
+  schema: {
+    querystring: {
+      type: "object",
+      required: ["id"],
+      properties: {
+        id: { type: "string", format: "uuid" },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        required: ["success", "ok", "data"],
+        properties: {
+          success: { type: "string" },
+          ok: { type: "boolean" },
+          data: {
+            type: "object",
+            required: ["id", "email", "Profile", "Wallet"],
+            properties: {
+              id: { type: "string", format: "uuid" },
+              email: { type: "string", format: "email" },
+              Profile: {
+                type: "object",
+                required: ["firstname", "lastname", "middlename", "age", "birthday", "address", "country"],
+                properties: {
+                  firstname: { type: "string" },
+                  lastname: { type: "string" },
+                  middlename: { type: "string" },
+                  age: { type: "integer" },
+                  birthday: { type: "string", format: "date" },
+                  address: { type: "string" },
+                  country: { type: "string" },
+                },
+              },
+              Wallet: {
+                type: "object",
+                required: ["balance", "currency", "income_amount", "income_period"],
+                properties: {
+                  balance: { type: "number" },
+                  currency: { type: "string" },
+                  income_amount: { type: "number" },
+                  income_period: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+      500: {
+        type: "object",
+        properties: {
+          server_failure: { type: "string" },
+          ok: { type: "boolean" },
+        },
+      },
+    },
+  },
+  handler: async function (request, reply) {
+    try {
+      const { id } = request.query as { id: string };
+
+      const data = await fastify.prisma.account.findUnique({
+        where: {
+          id: id,
+        },
+        select: {
+          id: true,
+          email: true,
+          Profile: {
+            select: {
+              firstname: true,
+              lastname: true,
+              middlename: true,
+              age: true,
+              birthday: true,
+              address: true,
+              country: true,
+            }
+          },
+          Wallet: {
+            select: {
+              balance: true,
+              currency: true,
+              income_amount: true,
+              income_period: true,
+            }
+          }
+        },
+      });
+
+      if (!data) throw new Error("Error Account Fetching");
+
+      reply.status(200).send({
+        success: "Account Fetched Successfuly",
+        ok: true,
+        data: data,
+      });
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ server_failure: error, ok: false });
+    }
+  },
+});
+
   // Delete and Account (Development Only)
   fastify.route({
     method: "DELETE",

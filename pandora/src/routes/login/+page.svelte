@@ -6,6 +6,8 @@
 	let formData = { email: "", password: "" }
 	let show_password = false
 
+	let error = ''
+
 	const nav = [
 		{
 			label: 'Home',
@@ -29,10 +31,13 @@
 		},
 	]
 
-	async function login() {
+	async function login(event: Event) {
+		event.preventDefault()
 
 		if (!formData.email || !formData.password) {
 			console.error("Error Invalid Email or Password")
+			error = 'Missing Fields'
+			return
 		}
 
 		try {
@@ -48,6 +53,9 @@
 			if (!response.ok) {
 				const resBody = await response.json();
 				console.error('Error Logging in:', resBody);
+				if (resBody.type !== null) {
+					error = resBody.type
+				}
 				return
 			}
 
@@ -57,7 +65,8 @@
 			goto('/dashboard')
 			
 		} catch (error) {
-			console.error('[Login error]', error);
+			console.error('Login error', error);
+			error = 'Login Failure, Please Try Again Later'
 		}
 	}
 
@@ -91,7 +100,7 @@
 			</h1>
 
 			<input 
-				class="w-2/3 rounded-lg outline-0 bg-gray-100 border-1 border-gray-300 my-2"
+				class='w-2/3 rounded-lg outline-0 bg-gray-100 border-1 border-gray-300 my-2'
 				type="text"
 				name="email"
 				placeholder="Enter your email"
@@ -99,7 +108,7 @@
 			<div class="flex w-2/3 relative">
 				<input 
 					name="password"
-					class="w-full rounded-lg outline-0 bg-gray-100 border-1 border-gray-300 my-2"
+					class='w-full rounded-lg outline-0 bg-gray-100 border-1 border-gray-300 my-2'
 					type={show_password ? 'text' : 'password'}
 					placeholder="Enter your password"
 					bind:value={formData.password}>
@@ -110,8 +119,10 @@
 						<FontAwesomeIcon icon={faEyeSlash} />
 					{/if}
 				</button>
-
 			</div>
+			{#if error}
+				<p class="text-red-500 font-medium">{error}</p>
+			{/if}
 			<input
 				class="flex w-2/3 h-12 justify-center items-center text-white font-semibold bg-zinc-950 rounded-xl hover:bg-zinc-900 hover:text-gray-200 active:bg-white active:text-black hover:shadow-md hover:shadow-black transition-all duration-250 cursor-pointer my-4"
 				type="submit"
