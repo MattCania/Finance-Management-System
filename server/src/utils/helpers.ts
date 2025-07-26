@@ -1,6 +1,5 @@
 import { AccountSchema } from "fastify";
 import { z } from "zod";
-import { ExtendedPrismaClient } from "../lib/extendedPrisma";
 
 export async function calculate_age(birthday: string) {
   const birthdate = new Date(birthday);
@@ -77,14 +76,4 @@ export async function validate_account(account: AccountSchema) {
     });
 
   return { errors: errors, parsed: parsed.success };
-}
-
-export async function fileUpload(path: string, name: string) {
-  const prisma = new ExtendedPrismaClient()
-
-  const file = await prisma.uploadFileFromPath(path, name);
-
-  if (!file) return {error: "File Upload Error", ok: false}
-  return {success: "File Created Successfully", ok: true}
-
 }

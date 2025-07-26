@@ -4,9 +4,6 @@ export default async function profileRoute(fastify: FastifyInstance) {
 	fastify.route({
 		method: "POST",
 		url: "/fetch_one",
-		schema: {
-
-		},
 		preValidation: [fastify.authenticate],
 		handler: async function (request, reply) {
       		const user = request.user as { id: string; email: string };

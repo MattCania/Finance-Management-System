@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { env } from "../lib/env.ts";
+import { env } from "../../lib/env.ts";
+import { authControllers } from './authentication.controller.ts'
 
 export default async function authRoute(fastify: FastifyInstance) {
   fastify.route({
@@ -31,48 +32,9 @@ export default async function authRoute(fastify: FastifyInstance) {
       },
     },
     preValidation: [fastify.authenticate],
-    handler: async function (request, reply) {
-      if (env.NODE_ENV === "development") {
-        console.log("Session Fetching");
-      }
-
-      const user = request.user as { id: string; email: string };
-      
-      const account = await fastify.prisma.account.findFirst({
-        where: { id: user.id },
-        select: {
-          id: true,
-          email: true,
-        },
-      });
-
-      if (!account) {
-        return reply.status(401).send({
-          server_failure: "Session Invalid: Account no longer exists.",
-          ok: false,
-        });
-      }
-
-      const newToken = fastify.jwt.sign(
-        { id: account.id, email: account.email },
-        { expiresIn: "12h" }
-      );
-
-      reply.setCookie("token", newToken, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "lax",
-        secure: env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 12,
-      });
-
-      reply.send({
-        success: "Session Verified",
-        ok: true,
-        data: account,
-      });
-    },
-  });
+    handler: authControllers.getSession()
+  })
+    
 
   // Login Route
   fastify.route({

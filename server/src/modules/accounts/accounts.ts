@@ -1,9 +1,9 @@
 import { AccountSchema, FastifyInstance } from "fastify";
 import bcrypt from "bcryptjs";
-import { calculate_age, validate_account } from "../utils/helpers.ts";
+import { calculate_age, validate_account } from "../../utils/helpers.ts";
 import {
   AccountProperties,
-} from "../data/objects.ts";
+} from "../../interface/objects.ts";
 
 export default async function accountsRoute(fastify: FastifyInstance) {
   // Create an account
