@@ -1,6 +1,8 @@
 import { FastifyInstance } from "fastify";
+import { profileService } from "./profile.services";
 
 export default async function profileRoute(fastify: FastifyInstance) {
+	const service = profileService(fastify)
 	fastify.route({
 		method: "POST",
 		url: "/fetch_one",
@@ -9,20 +11,7 @@ export default async function profileRoute(fastify: FastifyInstance) {
       		const user = request.user as { id: string; email: string };
 
 			try {
-				const profile = await fastify.prisma.profile.findUnique({
-					where: {
-						id: user.id
-					},
-					select: {
-						age: true,
-						address: true,
-						birthday: true,
-						country: true,
-						firstname: true,
-						middlename: true,
-						lastname: true,
-					},
-				})
+				const profile = await service.getProfile(user.id)
 
 				if (!profile) {
 					reply.status(404).send({error: "No Profile Found", type: "Not Found", ok: false})

@@ -4,8 +4,10 @@ import { calculate_age, validate_account } from "../../utils/helpers.ts";
 import {
   AccountProperties,
 } from "../../interface/objects.ts";
+import { accountsService } from "./accounts.services.ts";
 
 export default async function accountsRoute(fastify: FastifyInstance) {
+  const service = accountsService(fastify)
   // Create an account
   fastify.route({
     method: "POST",
@@ -152,16 +154,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
       try {
         const { id } = request.query as { id: string };
 
-        const data = await fastify.prisma.account.findUnique({
-          where: {
-            id: id,
-          },
-          select: {
-            id: true,
-            email: true,
-            created_at: true,
-          },
-        });
+        const data = await service.findAccount(id)
 
         if (!data) throw new Error("Error Account Fetching");
 
@@ -242,34 +235,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
     try {
       const { id } = request.query as { id: string };
 
-      const data = await fastify.prisma.account.findUnique({
-        where: {
-          id: id,
-        },
-        select: {
-          id: true,
-          email: true,
-          Profile: {
-            select: {
-              firstname: true,
-              lastname: true,
-              middlename: true,
-              age: true,
-              birthday: true,
-              address: true,
-              country: true,
-            }
-          },
-          Wallet: {
-            select: {
-              balance: true,
-              currency: true,
-              income_amount: true,
-              income_period: true,
-            }
-          }
-        },
-      });
+      const data = await service.findProfile(id)
 
       if (!data) throw new Error("Error Account Fetching");
 
@@ -285,7 +251,7 @@ export default async function accountsRoute(fastify: FastifyInstance) {
   },
 });
 
-  // Delete and Account (Development Only)
+  // Delete and Account (Development Only), TODO!!
   fastify.route({
     method: "DELETE",
     url: "/delete_one",

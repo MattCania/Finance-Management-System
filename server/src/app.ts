@@ -7,11 +7,11 @@ import prismaPlugin from './plugins/prisma.ts'
 import bcryptPlugin from './plugins/bcrypt.ts'
 import jwtPlugin from './plugins/jwt.ts'
 
-import accountsRoute from "./modules/accounts/accounts.ts";
-import authRoute from './modules/authentication/authenticate.ts'
-import walletRoute from "./modules/wallet/wallet.ts";
-import transactionsRoute from "./modules/transactions/transactions.ts";
-import profileRoute from "./modules/profiles/profile.ts";
+import accountsRoute from "./modules/accounts/accounts.routes.ts";
+import authRoute from './modules/authentication/authenticate.routes.ts'
+import walletRoute from "./modules/wallet/wallet.routes.ts";
+import transactionsRoute from "./modules/transactions/transactions.routes.ts";
+import profileRoute from "./modules/profiles/profile.routes.ts";
 
 // Create fastify instance
 const fastify = Fastify({
